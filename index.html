@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    border-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    background: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+  }
+
+  #canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .card {
+    width: 300px;
+    padding: 10px 10px 10px 10px;
+    border: 5px solid rgba(0, 0, 0, 9);
+    border-radius: 0px;
+    background: #ffffff;
+    position: relative;
+  }
+
+  .card .row {
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid: auto / auto auto;
+    grid-template-columns: repeat(auto-fit,minmax(100%, 1fr));
+    grid-gap: 20px;
+  }
+  
+  .card .row .col {
+    position: relative;
+    width: 100%;
+    margin: 30px 120px 40px 0px;
+    transition: 0.5s;
+  }
+  
+  .card .row .form-group {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    color: #000000;
+  }
+
+  .card .row .form-group input,
+  .card .row .form-group textarea {
+    position: absolute;
+    width: 75%;
+    height: 100%;
+    background: transparent;
+    outline: none;
+    font-size: 24px;
+    padding: 10px 0 10px 20px;
+    border: 5px solid rgba(0, 0, 0, 0.9);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 9);
+    color: #ffffff;
+    border-radius: 0px;
+  }
+  
+  .card .row .form-group input:focus,
+  .card .row .form-group textarea:focus {
+    border: 5px solid #000000;
+    transition: all 0.5s;
+  }
+
+  .col {
+    width: calc(50% - 10px);
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .card .row input[type="text"] {
+    border: 5px solid rgba(0, 0, 0, 9);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 9);
+    padding: 10px;
+    height: 100%;
+    width: 50%;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+    text-transform: uppercase;
+    color: #000000;
+    line-height: 40px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 0px;
+    transition: all 0.4s;
+  }
+  
+  .card .row input[type="text"]:hover {
+    border: 5px solid rgba(0, 0, 0, 0);
+    color: #000000;
+    transition: all 0.4s;
+  }
+  
+  input[type="text"],
+  select {
+    width: 270px;
+    padding: 10px;
+    border: 5px solid rgba(0, 0, 0, 0.9);
+    border-radius: 0px;
+    font-size: 16px;
+  }
+
+  .btn {
+    width: 300px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    border: none;
+    border-radius: 0px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .urls-box {
+    margin-top: 10px;
+    padding: 10px 10px 10px 10px;
+    background-color: white;
+    border-radius: 0px;
+    border: 5px solid rgba(0, 0, 0, 9);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    font-size: 10px;
+    color: black;
+    position: relative;
+  }
+</style>
+<title>PEOPLE SEARCH</title>
+<link href="https://fonts.googleapis.com/css?family=JetBrains+Mono" rel="stylesheet">
+<!-- Include GSAP library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+<script>
+    function showForm() {
+      const formContainer = document.getElementById("formContainer");
+      const showFormButton = document.getElementById("showFormButton");
+      formContainer.style.display = "block";
+      showFormButton.style.display = "none";
+    }
+		
+        function generateUrls() {
+            const formContainer = document.getElementById("formContainer");
+            const urlsBox = document.getElementById("urls");
+            gsap.to(formContainer, {duration: 1, x: "-10%"});
+            gsap.to(urlsBox, {duration: 1, x: "10%"});
+            var FIRST_NAME_INPUT = document.getElementById("FIRST_NAME_INPUT").value;
+            var LAST_NAME_INPUT = document.getElementById("LAST_NAME_INPUT").value;
+            var CITY_INPUT = document.getElementById("CITY_INPUT").value;
+            var STATE_INPUT = document.getElementById("STATE_INPUT").value;
+
+            var urls = [
+                "https://411.com/person-search/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-"),
+				"https://411.info/people/?fn&" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://addresses.com/people/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+				"https://addresssearch.com/people-search-full-name.php?fn=" + FIRST_NAME_INPUT + "&ln=" + LAST_NAME_INPUT,
+				"https://advanced-people-search.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://advancedbackgroundchecks.com/names/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://allpeople.com/search?ss=" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "&ss-e=&ss-p=&ss-i=&where=&industry-auto=&where-auto=",
+				"https://anywho.com/people/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+				"https://archives.com/search/ancestor/results?FirstName=" + FIRST_NAME_INPUT + "&LastName=" + LAST_NAME_INPUT + "&Country=United%20States&RecordSearchType=Unknown",
+				"https://arrestfacts.com/ng/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT + "&state=&city=&age=&type=&site=",
+				"https://backgroundalert.com/path/background/ln/1/results?searchbox=simple&SID=POLoxpD_5sLP7XYEyDA8aSqrOkZT8F9_&fn=" + FIRST_NAME_INPUT + "&ln=" + LAST_NAME_INPUT,
+				"https://backgroundcheck.run/ng/profile/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT,
+				"https://blockshoppers.com/search/?q=" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+				"https://calltruth.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://centeda.com/profile/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT + "&state=&city=&fage=",
+				"https://checkpeople.com/landing/people/k1u2r3t4/searching?firstName=" + FIRST_NAME_INPUT + "&lastName=" + LAST_NAME_INPUT + "&state=&city=&aid=11&sid=&tid=&hitid=&iv=&obcid=",
+				"https://classmates.com/siteui/search/results?q=" + FIRST_NAME_INPUT + "%20" + LAST_NAME_INPUT + "&searchType=all",
+				"https://clustrmaps.com/persons/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://councilon.com/profile/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT + "&state=&city=&fage=",
+				"https://cubib.com/search_results.php?fname=" + FIRST_NAME_INPUT + "&lname=&" + LAST_NAME_INPUT + "&locations:all",
+				"https://cyberbackgroundchecks.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://dataveria.com/profile/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT + "&state=&city=&fage=",
+				"https://familytreenow.com/search/genealogy/results?first&" + FIRST_NAME_INPUT + "&last=&" + LAST_NAME_INPUT,
+				"https://fastpeoplesearch.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://findpeoplesearch.com/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "/1/16983092709439",
+				"https://freepeopledirectory.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://gladiknow.com/index-people-search?fn=" + FIRST_NAME_INPUT + "&ln=" + LAST_NAME_INPUT + "&city=&state=&age=&dob=&relatives=&aliases=&phones=&email=&search=",
+				"https://gladiknow.com/index-people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "-CA/MYTH-T248-96/",
+				"https://google.com/search?q=site:rocketreach.co+" + FIRST_NAME_INPUT + "&" + LAST_NAME_INPUT + "&",
+				"https://idcrawl.com/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://intelius.com/people-search/&" + FIRST_NAME_INPUT + "&-&" + LAST_NAME_INPUT,
+				"https://locatepeople.org/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/",
+				"https://locatepeople.org/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/california/",
+				"https://neighbor.report/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://nuwber.com/search?name=" + FIRST_NAME_INPUT + "%20" + LAST_NAME_INPUT,
+				"https://officialusa.com/names/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/",
+				"https://peekyou.com/" + FIRST_NAME_INPUT + "_" + LAST_NAME_INPUT,
+				"https://peekyou.com/usa/california/" + CITY_INPUT.replace(/\s/g, "-") + "/" + FIRST_NAME_INPUT + "_" + LAST_NAME_INPUT,
+				"https://peeplookup.com/people/search?name=" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+				"https://peoplebyname.com/people/" + LAST_NAME_INPUT + "/" + FIRST_NAME_INPUT,
+				"https://peoplesearchnow.com/person/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://privateeye.com/people/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "/" + STATE_INPUT + "/?_csrf=lhzfbqvevc",
+				"https://privateeye.com/people/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+				"https://pub360.com/profile/same/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://publicrecordsnow.com/name/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "" + STATE_INPUT + "/",
+				"https://searchpeoplefree.com/find/" + FIRST_NAME_INPUT + "&-&" + LAST_NAME_INPUT,
+				"https://smartbackgroundchecks.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "/" + STATE_INPUT,
+				"https://social-searcher.com/search-users/?q6=" + FIRST_NAME_INPUT + "&+&" + LAST_NAME_INPUT,
+				"https://spokeo.com/" + FIRST_NAME_INPUT + "&-&" + LAST_NAME_INPUT + "&?loaded=1",
+				"https://spytox.com/people/search?name= " + FIRST_NAME_INPUT + "&+ &" + LAST_NAME_INPUT,
+				"https://telephonedirectories.us/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://thatsthem.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://truepeoplesearch.com/results?name=" + FIRST_NAME_INPUT + "%20" + LAST_NAME_INPUT,
+				"https://truthfinder.com/results/?firstName=" + FIRST_NAME_INPUT + "&&lastName=" + LAST_NAME_INPUT + "&state=ALL",
+				"https://usphonebook.com/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/california/" + CITY_INPUT.replace(/\s/g, "-"),
+				"https://webmii.com/people?n=%22" + FIRST_NAME_INPUT + "%20" + LAST_NAME_INPUT + "%22",
+				"https://whitepages.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT,
+				"https://yasni.com/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "/check+people",
+				"https://zabasearch.com/people/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "/",
+                "https://californialicensing.org/licenses?q=" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+                "https://checkpeople.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/in-" + STATE_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-"),
+                "https://cocofinder.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT,
+                "https://corporationwiki.com/search/withfacets?term=" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT + "&entityFacet=Person",
+                "https://familytreenow.com/search/genealogy/results?first=" + FIRST_NAME_INPUT + "&last=" + LAST_NAME_INPUT + "&city&statezip=" + CITY_INPUT.replace(/\s/g, "-") + "," + STATE_INPUT,
+                "https://fastbackgroundcheck.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "-" + STATE_INPUT,
+                "https://fastpeoplesearch.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "_" + CITY_INPUT.replace(/\s/g, "-") + "-" + STATE_INPUT,
+                "https://findpeoplefast.net/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT,
+                "https://findpeoplefast.net/search?first_name=" + FIRST_NAME_INPUT + "&last_name=" + LAST_NAME_INPUT + "&minage=&state=" + STATE_INPUT,
+                "https://inforver.com/profile/search?fname=" + FIRST_NAME_INPUT + "&lname=" + LAST_NAME_INPUT + "&state=" + STATE_INPUT + "&city=" + CITY_INPUT.replace(/\s/g, "-") + "&fage=",
+                "https://jailbase.com/search/?firstname=" + FIRST_NAME_INPUT + "&lastname=" + LAST_NAME_INPUT + "&location_state=" + STATE_INPUT + "&location=",
+                "https://localcrimenews.com/welcome/searchArrests?firstname=" + FIRST_NAME_INPUT + "&lastname=" + LAST_NAME_INPUT + "&city=" + CITY_INPUT.replace(/\s/g, "-"),
+                "https://nuwber.com/search?city=" + CITY_INPUT.replace(/\s/g, "-") + "&name=" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "&state=" + STATE_INPUT,
+                "https://propeoplesearch.com/people-search/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/california/" + CITY_INPUT.replace(/\s/g, "-"),
+                "https://publicdatausa.com/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "-" + STATE_INPUT,
+                "https://searchpeoplefree.com/find/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-"),
+                "https://thatsthem.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "-" + STATE_INPUT,
+                "https://truepeoplesearch.com/results?name=" + FIRST_NAME_INPUT + "%20" + LAST_NAME_INPUT + "&citystatezip=" + CITY_INPUT.replace(/\s/g, "-") + ",%20" + STATE_INPUT,
+                "https://truepeoplesearch.com/results?name=" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "&citystatezip=" + CITY_INPUT.replace(/\s/g, "-") + "," + STATE_INPUT,
+                "https://ufind.name/" + FIRST_NAME_INPUT + "+" + LAST_NAME_INPUT,
+                "https://unmask.com/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT + "-" + CITY_INPUT.replace(/\s/g, "-") + "/",
+                "https://usa-people-search.com/name/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-") + "-" + STATE_INPUT,
+				"https://cyberbackgroundchecks.com/people/" + FIRST_NAME_INPUT + "-" + LAST_NAME_INPUT + "/" + STATE_INPUT + "/" + CITY_INPUT.replace(/\s/g, "-"),
+            ];
+
+            var urlsDiv = document.getElementById("urls");
+            urlsDiv.style.display = "block";
+            urlsDiv.innerHTML = "";
+            urlsDiv.style.display = "grid";
+            urlsDiv.style.gridTemplateColumns = "repeat(5, 1fr)";
+            urlsDiv.style.gridGap = "10px";
+            for (var i = 0; i < urls.length; i++) {
+                var button = document.createElement("button");
+                button.style.width = "100%";
+                button.style.padding = "10px";
+                button.style.marginBottom = "10px";
+                button.style.backgroundColor = "#000000";
+                button.style.border = "none";
+                button.style.color = "white";
+                button.style.textAlign = "center";
+                button.style.textDecoration = "none";
+                button.style.display = "inline-block";
+                button.style.fontSize = "16px";
+                button.style.transitionDuration = "0.4s";
+                button.style.cursor = "pointer";
+                button.onmouseover = function() {
+                    this.style.backgroundColor = "white";
+                    this.style.color = "black";
+                }
+                button.onmouseout = function() {
+                    this.style.backgroundColor = "#000000";
+                    this.style.color = "white";
+                }
+                button.onclick = (function(url) {
+                    return function() {
+                        window.open(url, '_blank');
+                    }
+                })(urls[i]);
+                var url = new URL(urls[i]);
+                button.textContent = url.hostname.split('.')[0];
+                urlsDiv.appendChild(button);
+            }
+        }
+
+        function openUrls() {
+            var urlsDiv = document.getElementById("urls");
+            var buttons = urlsDiv.getElementsByTagName("button");
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].click();
+            }
+        }
+    </script>
+	
+	
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <button id="showFormButton" class="btn" onclick="showForm()">PEOPLE SEARCH</button>
+  
+  <div id="formContainer" style="display: none; transition: all 0.5s ease-in-out;">
+    <div class="card">
+      <div class="col">
+        <div class="form-group">
+          <input type="text" placeholder="FIRST NAME" id="FIRST_NAME_INPUT">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <input type="text" placeholder="LAST NAME" id="LAST_NAME_INPUT">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <input type="text" placeholder="CITY" id="CITY_INPUT">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <select id="STATE_INPUT">
+            <option value="AL">AL</option>
+            <option value="AK">AK</option>
+            <option value="AZ">AZ</option>
+            <option value="AR">AR</option>
+            <option value="CA">CA</option>
+            <option value="CO">CO</option>
+            <option value="CT">CT</option>
+            <option value="DE">DE</option>
+            <option value="FL">FL</option>
+            <option value="GA">GA</option>
+            <option value="HI">HI</option>
+            <option value="ID">ID</option>
+            <option value="IL">IL</option>
+            <option value="IN">IN</option>
+            <option value="IA">IA</option>
+            <option value="KS">KS</option>
+            <option value="KY">KY</option>
+            <option value="LA">LA</option>
+            <option value="ME">ME</option>
+            <option value="MD">MD</option>
+            <option value="MA">MA</option>
+            <option value="MI">MI</option>
+            <option value="MN">MN</option>
+            <option value="MS">MS</option>
+            <option value="MO">MO</option>
+            <option value="MT">MT</option>
+            <option value="NE">NE</option>
+            <option value="NV">NV</option>
+            <option value="NH">NH</option>
+            <option value="NJ">NJ</option>
+            <option value="NM">NM</option>
+            <option value="NY">NY</option>
+            <option value="NC">NC</option>
+            <option value="ND">ND</option>
+            <option value="OH">OH</option>
+            <option value="OK">OK</option>
+            <option value="OR">OR</option>
+            <option value="PA">PA</option>
+            <option value="RI">RI</option>
+            <option value="SC">SC</option>
+            <option value="SD">SD</option>
+            <option value="TN">TN</option>
+            <option value="TX">TX</option>
+            <option value="UT">UT</option>
+            <option value="VT">VT</option>
+            <option value="VA">VA</option>
+            <option value="WA">WA</option>
+            <option value="WV">WV</option>
+            <option value="WI">WI</option>
+            <option value="WY">WY</option>
+          </select>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <button type="button" class="btn" onclick="generateUrls()">GENERATE URLS</button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <button type="button" class="btn" onclick="openUrls()">OPEN ALL URLS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <div class="urls-box" id="urls" style="display: none;"></div>
+<script>
+
+console.clear();
+console.log("lsakdfalskjdflnksd");
+
+const config = {
+  src:
+    "https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/open-peeps-sheet.png",
+  rows: 15,
+  cols: 7
+};
+
+// UTILS
+
+const randomRange = (min, max) => min + Math.random() * (max - min);
+
+const randomIndex = (array) => randomRange(0, array.length) | 0;
+
+const removeFromArray = (array, i) => array.splice(i, 1)[0];
+
+const removeItemFromArray = (array, item) =>
+  removeFromArray(array, array.indexOf(item));
+
+const removeRandomFromArray = (array) =>
+  removeFromArray(array, randomIndex(array));
+
+const getRandomFromArray = (array) => array[randomIndex(array) | 0];
+
+// TWEEN FACTORIES
+
+const resetPeep = ({ stage, peep }) => {
+  const direction = Math.random() > 0.5 ? 1 : -1;
+  // using an ease function to skew random to lower values to help hide that peeps have no legs
+  const offsetY = 100 - 250 * gsap.parseEase("power2.in")(Math.random());
+  const startY = stage.height - peep.height + offsetY;
+  let startX;
+  let endX;
+
+  if (direction === 1) {
+    startX = -peep.width;
+    endX = stage.width;
+    peep.scaleX = 1;
+  } else {
+    startX = stage.width + peep.width;
+    endX = 0;
+    peep.scaleX = -1;
+  }
+
+  peep.x = startX;
+  peep.y = startY;
+  peep.anchorY = startY;
+
+  return {
+    startX,
+    startY,
+    endX
+  };
+};
+
+const normalWalk = ({ peep, props }) => {
+  const { startX, startY, endX } = props;
+
+  const xDuration = 10;
+  const yDuration = 0.25;
+
+  const tl = gsap.timeline();
+  tl.timeScale(randomRange(0.5, 1.5));
+  tl.to(
+    peep,
+    {
+      duration: xDuration,
+      x: endX,
+      ease: "none"
+    },
+    0
+  );
+  tl.to(
+    peep,
+    {
+      duration: yDuration,
+      repeat: xDuration / yDuration,
+      yoyo: true,
+      y: startY - 10
+    },
+    0
+  );
+
+  return tl;
+};
+
+const walks = [normalWalk];
+
+// CLASSES
+
+class Peep {
+  constructor({ image, rect }) {
+    this.image = image;
+    this.setRect(rect);
+
+    this.x = 0;
+    this.y = 0;
+    this.anchorY = 0;
+    this.scaleX = 1;
+    this.walk = null;
+  }
+
+  setRect(rect) {
+    this.rect = rect;
+    this.width = rect[2];
+    this.height = rect[3];
+
+    this.drawArgs = [this.image, ...rect, 0, 0, this.width, this.height];
+  }
+
+  render(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.scale(this.scaleX, 1);
+    ctx.drawImage(...this.drawArgs);
+    ctx.restore();
+  }
+}
+
+// MAIN
+
+const img = document.createElement("img");
+img.onload = init;
+img.src = config.src;
+
+const canvas = document.querySelector("#canvas");
+const ctx = canvas.getContext("2d");
+
+const stage = {
+  width: 0,
+  height: 0
+};
+
+const allPeeps = [];
+const availablePeeps = [];
+const crowd = [];
+
+function init() {
+  createPeeps();
+
+  // resize also (re)populates the stage
+  resize();
+
+  gsap.ticker.add(render);
+  window.addEventListener("resize", resize);
+}
+
+function createPeeps() {
+  const { rows, cols } = config;
+  const { naturalWidth: width, naturalHeight: height } = img;
+  const total = rows * cols;
+  const rectWidth = width / rows;
+  const rectHeight = height / cols;
+
+  for (let i = 0; i < total; i++) {
+    allPeeps.push(
+      new Peep({
+        image: img,
+        rect: [
+          (i % rows) * rectWidth,
+          ((i / rows) | 0) * rectHeight,
+          rectWidth,
+          rectHeight
+        ]
+      })
+    );
+  }
+}
+
+function resize() {
+  stage.width = canvas.clientWidth;
+  stage.height = canvas.clientHeight;
+  canvas.width = stage.width * devicePixelRatio;
+  canvas.height = stage.height * devicePixelRatio;
+
+  crowd.forEach((peep) => {
+    peep.walk.kill();
+  });
+
+  crowd.length = 0;
+  availablePeeps.length = 0;
+  availablePeeps.push(...allPeeps);
+
+  initCrowd();
+}
+
+function initCrowd() {
+  while (availablePeeps.length) {
+    // setting random tween progress spreads the peeps out
+    addPeepToCrowd().walk.progress(Math.random());
+  }
+}
+
+function addPeepToCrowd() {
+  const peep = removeRandomFromArray(availablePeeps);
+  const walk = getRandomFromArray(walks)({
+    peep,
+    props: resetPeep({
+      peep,
+      stage
+    })
+  }).eventCallback("onComplete", () => {
+    removePeepFromCrowd(peep);
+    addPeepToCrowd();
+  });
+
+  peep.walk = walk;
+
+  crowd.push(peep);
+  crowd.sort((a, b) => a.anchorY - b.anchorY);
+
+  return peep;
+}
+
+function removePeepFromCrowd(peep) {
+  removeItemFromArray(crowd, peep);
+  availablePeeps.push(peep);
+}
+
+function render() {
+  canvas.width = canvas.width;
+  ctx.save();
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  crowd.forEach((peep) => {
+    peep.render(ctx);
+  });
+
+  ctx.restore();
+}
+
+
+// Rest of the JavaScript code...
+
+</script>
+<div style="position: fixed; bottom: 0; right: 0; text-align: right; margin: 10px;">
+    <p>croudsimulator background is by: <a href="https://codepen.io/zadvorsky" target="_blank">Szenia Zadvornykh</a> taken from codepen.io</p>
+</div>
+</body>
+</html>

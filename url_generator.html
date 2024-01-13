@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Code+Latin&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Code Latin', monospace;
+            color: black;
+            background-color: white;
+        }
+        .flat-style {
+            border: none;
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 5px;
+        }
+        #urlInput,
+        #output {
+            width: 100%; /* Make only URL textareas take full width */
+        }
+        #urlInput {
+            min-height: 200px; /* Larger default size for urlInput */
+        }
+        #output {
+            min-height: 300px; /* Make output textarea larger */
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="urlInput" class="flat-style" placeholder="Enter URLs here (one per line)"></textarea>
+    <br>
+    <button id="addButton" class="flat-style">Add Search/Replace String</button>
+    <br>
+    <select id="formatSelect" class="flat-style">
+        <option value="standard">Standard</option>
+        <option value="excel">Excel</option>
+        <option value="javascript">JavaScript</option>
+    </select>
+    <div id="searchReplaceContainer"></div>
+    <br>
+    <button id="generateButton" class="flat-style">Generate Modified URLs</button>
+    <br>
+    <textarea id="output" class="flat-style" readonly></textarea>
+    <br>
+    <button id="clearButton" class="flat-style">Clear Output</button>
+
+    <script>
+        const searchReplaceContainer = document.getElementById('searchReplaceContainer');
+        const urlInput = document.getElementById('urlInput');
+        const output = document.getElementById('output');
+        const formatSelect = document.getElementById('formatSelect');
+
+        function addSearchReplaceFields() {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <input type="text" class="flat-style" placeholder="Search for" />
+                <input type="text" class="flat-style" placeholder="Replace with" />
+                <button class="flat-style" onclick="removeSearchReplaceFields(this)">Remove</button>
+            `;
+            searchReplaceContainer.appendChild(div);
+        }
+
+        function removeSearchReplaceFields(button) {
+            searchReplaceContainer.removeChild(button.parentNode);
+        }
+
+        function generateModifiedUrls() {
+            const format = formatSelect.value;
+            const searchReplacePairs = Array.from(searchReplaceContainer.querySelectorAll('div')).map(div => ({
+                search: div.children[0].value.toLowerCase(),
+                replace: div.children[1].value
+            }));
+            const urls = urlInput.value.split('\n');
+            let modifiedUrls = urls.map(url => {
+                let modifiedUrl = url;
+                let isEndWithReplaceString = false;
+                searchReplacePairs.forEach(({ search, replace }) => {
+                    const regex = new RegExp(search, 'gi');
+                    modifiedUrl = modifiedUrl.replace(regex, () => {
+                        isEndWithReplaceString = url.endsWith(search);
+                        if (format === 'excel') {
+                            return `" & "${replace}" & "`;
+                        } else if (format === 'javascript') {
+                            return `" + "${replace}" + "`;
+                        }
+                        return replace;
+                    });
+                });
+                if (format === 'excel') {
+                    modifiedUrl = `=concat("${modifiedUrl}`;
+                    if (isEndWithReplaceString) {
+                        modifiedUrl += '")';
+                    } else {
+                        modifiedUrl += '")';
+                    }
+                } else if (format === 'javascript') {
+                    modifiedUrl = `"${modifiedUrl}`;
+                    if (isEndWithReplaceString) {
+                        modifiedUrl += '",';
+                    } else {
+                        modifiedUrl += '",';
+                    }
+                }
+                return modifiedUrl;
+            });
+            output.value = modifiedUrls.join('\n');
+        }
+
+        function clearOutput() {
+            output.value = '';
+        }
+
+        document.getElementById('addButton').addEventListener('click', addSearchReplaceFields);
+        document.getElementById('generateButton').addEventListener('click', generateModifiedUrls);
+        document.getElementById('clearButton').addEventListener('click', clearOutput);
+
+        // Load saved search/replace pairs and URLs
+        window.addEventListener('load', () => {
+            const savedData = JSON.parse(localStorage.getItem('urlGeneratorData')) || {};
+            urlInput.value = savedData.urls || '';
+            (savedData.searchReplacePairs || []).forEach(pair => {
+                addSearchReplaceFields();
+                const div = searchReplaceContainer.lastElementChild;
+                div.children[0].value = pair.search;
+                div.children[1].value = pair.replace;
+            });
+        });
+
+        // Save search/replace pairs and URLs
+        window.addEventListener('beforeunload', () => {
+            const searchReplacePairs = Array.from(searchReplaceContainer.querySelectorAll('div')).map(div => ({
+                search: div.children[0].value,
+                replace: div.children[1].value
+            }));
+            const dataToSave = {
+                urls: urlInput.value,
+                searchReplacePairs: searchReplacePairs
+            };
+            localStorage.setItem('urlGeneratorData', JSON.stringify(dataToSave));
+        });
+    </script>
+</body>
+</html>
